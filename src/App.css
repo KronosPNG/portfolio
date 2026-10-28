@@ -1,0 +1,8 @@
+#root{
+    height: inherit;
+}
+
+#user-interface{
+    font: "aseprite";
+    position: absolute;
+}

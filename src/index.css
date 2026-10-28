@@ -1,0 +1,21 @@
+*{
+    margin:0;
+    padding: 0;
+}
+
+html{
+    --ground-color: #171516;
+    --bg-color-main: #222034;
+}
+
+html, body{
+    height: 100%;
+    overflow-x: hidden;
+    background-color: var(--bg-color-main);
+}
+
+@font-face {
+    font-family: "aseprite";
+    src: url("/fonts/aseprite.otf") format("otf");
+}
+
