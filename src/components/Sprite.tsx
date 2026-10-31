@@ -1,7 +1,6 @@
-import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { forwardRef } from "react";
 
-type SpriteProps = {
+export type SpriteProps = {
     src: string;
     frameWidth: number;
     frameHeight: number;
@@ -9,29 +8,47 @@ type SpriteProps = {
     fps?: number;
     frame?: number;
     scale?:number;
+    id?: string
 };
 
-export function Sprite({
-    src,
-    frameWidth,
-    frameHeight,
-    frames,
-    fps = 0,
-    frame = 0,
-    scale = 10
-}: SpriteProps) {
+export const Sprite = forwardRef<HTMLDivElement, SpriteProps>(
+ 
+    function Sprite(    
+    {
+        src,
+        frameWidth,
+        frameHeight,
+        frames,
+        fps = 0,
+        frame = 0,
+        scale = 10,
+        id=""
+    }: SpriteProps,
+
+    ref,
     
-    return(
-        <div
-        style={{
-            width: frameWidth * scale,
-            height: frameHeight * scale,
-            backgroundImage: `url(${src})`,
-            backgroundPosition: `${-frame * frameWidth * scale}px 0px`,
-            backgroundSize: `${frameWidth * frames * scale}px ${frameHeight * scale}px`,
-            backgroundRepeat: "no-repeat",
-            imageRendering: "pixelated",
-        }}
-        />
-    )
-}
+    
+    ) {
+        
+        return(
+            <div
+            id={id}
+            className="animated-sprite"
+
+            ref={ref}
+
+            style={{
+                width: Math.round(frameWidth * scale),
+                height: Math.round(frameHeight * scale),
+                backgroundImage: `url(${src})`,
+                backgroundPositionX: `-${Math.round(frame * frameWidth * scale)}px`,
+                backgroundPositionY: "0px",
+                backgroundSize: `${Math.round(frameWidth * frames * scale)}px ${Math.round(frameHeight * scale)}px`,
+                backgroundRepeat: "no-repeat",
+                imageRendering: "pixelated",
+                flexShrink: "0",
+            }}
+            />
+        )
+    }
+);

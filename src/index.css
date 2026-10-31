@@ -6,6 +6,10 @@
 html{
     --ground-color: #171516;
     --bg-color-main: #222034;
+    --main-font-color: #ae76d6;
+    --secondary-font-color: #5b6ee1;
+    --main-font : "aseprite";
+    --alt-font:  Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html, body{
@@ -16,6 +20,9 @@ html, body{
 
 @font-face {
     font-family: "aseprite";
-    src: url("/fonts/aseprite.otf") format("otf");
+    src: url("/fonts/aseprite.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
