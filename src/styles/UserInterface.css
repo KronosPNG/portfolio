@@ -1,0 +1,104 @@
+
+#user-interface{
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: fit-content;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+#user-interface>a{
+    text-decoration: none;
+    color: var(--secondary-font-color);
+    width: fit-content;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#user-interface>a:visited{
+    color: var(--secondary-font-color);
+}
+
+#user-interface>a:hover{
+    color: var(--main-font-color);
+}
+
+#user-interface>a:active{
+    color: blue;
+}
+
+#title-card{
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#title-card h1{
+    text-align: left;
+    color: var(--main-font-color);
+}
+
+#avatar{
+    width: fit-content;
+    display: grid;
+}
+
+#avatar>#avatar-bubble{
+    visibility: hidden;
+}
+
+#avatar:hover>#avatar-bubble{
+    visibility: visible;
+}
+
+#avatar>*{
+    grid-area: 1/1;
+}
+
+#photo{
+    display: block;
+    margin: auto;
+}
+
+#icon-buttons-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 35%;
+}
+
+.icon-buttons{
+    display: grid;
+    width: fit-content;
+}
+
+.icon-buttons>*{
+    grid-area: 1/1;
+}
+
+.icon-buttons>.hover-icon{
+    visibility: hidden;
+}
+
+.icon-buttons:hover>.hover-icon{
+    visibility: visible;
+}
+
+.icon-buttons:active>.default-icon>div{
+    scale: .95;
+    background-position-x: 100% !important;
+}
+
+.icon-buttons:active>div:not(.default-icon),
+#font-change>div:not(.default-icon, .hover-icon){
+    visibility: hidden;
+}

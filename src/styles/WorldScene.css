@@ -75,6 +75,7 @@
 }
 
 #campfire{
+    cursor: pointer;
     grid-row: 1;
     grid-column: 12;
     justify-self: center;
@@ -113,5 +114,6 @@
     position: absolute;
     z-index: 5;
     color: var(--secondary-font-color);
+    opacity: .5;
 }
 

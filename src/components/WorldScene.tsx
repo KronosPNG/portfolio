@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Sprite, type SpriteProps } from "./Sprite";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -18,11 +18,19 @@ import CloudImg3 from "/assets/art/home/clouds/cloud_3.png"
 import MountainsNear from "/assets/art/home/mountains/mountains_near.png";
 import MountainsMid from "/assets/art/home/mountains/mountains_mid.png";
 import MountainsFar from "/assets/art/home/mountains/mountains_far.png";
-import TreeImg from "/assets/art/home/tree/tree_lit.png";
-import CampfireImg from "/assets/art/home/campfire/campfire_lit.png";
-import GroundLightImg from "/assets/art/home/ground_light/ground_lit.png";
 
-import CharacterSprite from"/assets/art/shared/character/lit.png";
+import TreeLit from "/assets/art/home/tree/tree_lit.png";
+import TreeAblaze from "/assets/art/home/tree/tree_ablaze.png";
+
+import CampfireUnlit from "/assets/art/home/campfire/campfire.png";
+import CampfireLit from "/assets/art/home/campfire/campfire_lit.png";
+import CampfireAblaze from "/assets/art/home/campfire/campfire_ablaze.png";
+
+import GroundLightLit from "/assets/art/home/ground_light/ground_lit.png";
+import GroundLightAblaze from "/assets/art/home/ground_light/ground_ablaze.png";
+
+import CharacterLit from"/assets/art/shared/character/lit.png";
+import CharacterAblaze from"/assets/art/shared/character/ablaze.png";
 
 function WorldScene(props: { sceneScale: number }){
     const scene = useRef<HTMLDivElement>(null);
@@ -32,8 +40,14 @@ function WorldScene(props: { sceneScale: number }){
     const groundRef = useRef<HTMLDivElement>(null);
     const star1Ref = useRef<HTMLDivElement>(null);
     const star2Ref = useRef<HTMLDivElement>(null);
+    
+    const mainTl = useRef<gsap.core.Timeline | null>(null);
+    const ablazeTl = useRef<gsap.core.Timeline | null>(null);
+    const aboutTl = useRef<gsap.core.Timeline | null>(null);
+    const projectsTl = useRef<gsap.core.Timeline | null>(null);
+    const experienceTl = useRef<gsap.core.Timeline | null>(null); 
 
-    const sceneFps = 4;
+    const sceneFps = 5;
     const sceneScale = props.sceneScale;
 
     const star1Props: SpriteProps = {
@@ -55,7 +69,7 @@ function WorldScene(props: { sceneScale: number }){
     }
 
     const treeProps: SpriteProps = {
-        src: TreeImg,
+        src: TreeLit,
         frameWidth: 48,
         frameHeight: 46,
         frames: 4,
@@ -64,7 +78,7 @@ function WorldScene(props: { sceneScale: number }){
     }
 
     const fireProps: SpriteProps = {
-        src: CampfireImg,
+        src: CampfireLit,
         frameWidth: 16,
         frameHeight: 16,
         frames: 4,
@@ -73,7 +87,7 @@ function WorldScene(props: { sceneScale: number }){
     }
 
     const charProps: SpriteProps = {
-        src: CharacterSprite,
+        src: CharacterLit,
         frameWidth: 16,
         frameHeight: 16,
         frames: 4,
@@ -82,22 +96,57 @@ function WorldScene(props: { sceneScale: number }){
     }
 
      const groundProps: SpriteProps = {
-        src: GroundLightImg,
+        src: GroundLightLit,
         frameWidth: 39,
         frameHeight: 5,
         frames: 4,
         fps: sceneFps,
         scale: sceneScale
     }
+    
+    const { contextSafe } = useGSAP({ scope: scene });
+
+    const scenes = {
+        normal: {
+            fire: fireProps,
+            character: charProps,
+            tree: treeProps,
+            ground: groundProps,
+        },
+
+        campfireAblaze: {
+            fire: { ...fireProps, frameHeight: 25, src: CampfireAblaze },
+            character: { ...charProps, src: CharacterAblaze },
+            tree: { ...treeProps, src: TreeAblaze },
+            ground: { ...groundProps, src: GroundLightAblaze },
+        },
+
+        menuInteracted:{
+            fire: { ...fireProps, frameHeight: 25, src: CampfireAblaze },
+            character: { ...charProps, src: CharacterAblaze },
+            tree: { ...treeProps, src: TreeAblaze },
+            ground: { ...groundProps, src: GroundLightAblaze },
+        }
+    } satisfies Record<string, {
+        fire: SpriteProps;
+        character: SpriteProps;
+        tree: SpriteProps;
+        ground: SpriteProps;
+    }>;
+
+    const [sceneState, setSceneState] = useState<keyof typeof scenes>("normal");
+    const currentScene = scenes[sceneState];
 
     useGSAP(() => {
-        const tl = gsap.timeline();
+        mainTl.current = gsap.timeline();
+
+        const tl = mainTl.current;
 
         const sprites = [
-            [charRef.current, charProps],
-            [treeRef.current, treeProps],
-            [fireRef.current, fireProps],
-            [groundRef.current, groundProps],
+            [charRef.current, currentScene.character],
+            [treeRef.current, currentScene.tree],
+            [fireRef.current, currentScene.fire],
+            [groundRef.current, currentScene.ground],
             [star1Ref.current, star1Props],
             [star2Ref.current, star2Props],
         ] as const;
@@ -115,15 +164,45 @@ function WorldScene(props: { sceneScale: number }){
             tl.kill();
         };
     }, {
-        dependencies: [sceneScale],
+        dependencies: [sceneScale, sceneState],
         revertOnUpdate: true,
     });
+
+    useGSAP(() => {
+        ablazeTl.current = gsap.timeline({
+            paused: true,
+            onStart: () => {
+                setSceneState("campfireAblaze");
+            },
+            onComplete: () => {
+                setSceneState("normal");
+            },
+        });
+
+        ablazeTl.current.to({}, {
+            duration: 1,
+        });
+        
+        const onCampfireClick = contextSafe(() => {
+            ablazeTl.current?.restart();
+        });
+
+        const campfire = fireRef.current;
+
+        campfire?.addEventListener("click", onCampfireClick);
+
+        return () => {
+            campfire?.removeEventListener("click", onCampfireClick);
+            ablazeTl.current?.kill();
+            ablazeTl.current = null;
+        };
+    }, []);
 
     return (
         <main ref={scene} id="home">
             <style>{`
                 #home{
-                    grid-template-rows: auto ${5*sceneScale}px;
+                    grid-template-rows: auto ${9*sceneScale}px;
                 }
 
                 #title-bg{
@@ -304,34 +383,34 @@ function WorldScene(props: { sceneScale: number }){
             <div id="ground-light">
                 <Sprite
                     ref={groundRef}
-                    {... groundProps}
+                    {... currentScene.ground}
                 />
             </div>
 
             <div id="tree">
                 <Sprite
                     ref={treeRef}
-                    {... treeProps}
+                    {... currentScene.tree}
                 />
             </div>
 
             
-            <div id="campfire">
+            <div id="campfire" style={{pointerEvents: sceneState != "normal" ? "none" : "auto",}}>
                 <Sprite
                     ref={fireRef}
-                    {... fireProps}
+                    {... currentScene.fire}
                 />
             </div>
 
             <div id="character">
                 <Sprite
                     ref={charRef}
-                    {... charProps}
+                    {... currentScene.character}
                 />
             </div>
             
             <p id="ai-disclaimer">
-                Proudly made without GenAI &lt;3
+                © 2027 - Luigi Turco - Proudly made without GenAI &lt;3
             </p>
         </main>
     );
